@@ -4,6 +4,7 @@ from utils import FakeObject
 class CTrainer(tf.keras.Model):
   def __init__(self, model, NViews, **kwargs):
     super().__init__(**kwargs)
+    assert 0 < NViews, "Must be at least 1 view"
     self._NViews = NViews
 
     self._model = model
@@ -36,8 +37,11 @@ class CTrainer(tf.keras.Model):
     return tf.concat(CE, axis=0)
 
   def _calcKLLoss(self, predictions):
+    if self._NViews < 2: return 0.0
+
+    # consistency across different views of the same image/sample
     KL = []
-    anchor = predictions[0]
+    anchor = tf.stop_gradient(predictions[0])
     for pred in predictions[1:]:
       KL.append(tf.losses.kl_divergence(anchor, pred))
       continue
@@ -82,20 +86,23 @@ class CTrainer(tf.keras.Model):
   @tf.function
   def train_step(self, data):
     images, (labels) = data
+    tf.assert_equal(tf.shape(images)[0], self._NViews, message="Expected %d views" % self._NViews)
+
     images = [images[i] for i in range(self._NViews)]
     batch = FakeObject({ 'images': images, 'labels': labels, })
     with tf.GradientTape() as tape:
       totalLoss = self._calcLoss(batch)
 
     self.optimizer.minimize(totalLoss, self._model.trainable_variables, tape=tape)
-    return {x.name: x.result() for x in [
-      self._loss, self._CELoss, self._KLLoss,
-      self._accuracy, self._topK
-    ]}
+
+    metrics = [ self._loss, self._CELoss, self._accuracy, self._topK ]
+    if 1 < self._NViews: metrics.append(self._KLLoss)
+    return {x.name: x.result() for x in metrics}
 
   @tf.function
   def test_step(self, data):
     images, labels = data
+    tf.assert_equal(tf.shape(images)[0], 1, message="Expected 1 view only during testing")
     images = [images[i] for i in range(1)]
     data = FakeObject({ 'images': images, 'labels': labels, })
 

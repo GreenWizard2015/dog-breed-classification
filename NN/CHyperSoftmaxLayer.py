@@ -13,15 +13,15 @@ class CHyperSoftmaxLayer(tf.keras.layers.Layer):
       trainable=True,
       name='W'
     )
-    self._P = tf.Variable(initial_value=1.0, trainable=True, name='P')
+    # global scaling
+    self._R = tf.Variable(initial_value=1., trainable=True, name='R')
     return super().build(input_shape)
 
   def call(self, x):
     emb = tf.linalg.l2_normalize(self._W, axis=-1)
     normalizedX, L = tf.linalg.normalize(x, axis=-1)
-
-    P = tf.clip_by_value(self._P, 1e-1, 1e+1)
+    
     cdist = tf.matmul(normalizedX, emb, transpose_b=True)
-    logits = tf.pow(cdist + 1.0, P) * L
-
-    return tf.nn.softmax(logits, axis=-1)
+    # scale by global scaling factor and by length of input vector, then clip to avoid NaNs
+    L = tf.clip_by_value(self._R * L, 1., 1e+9)
+    return tf.nn.softmax((cdist + 1.0) * L, axis=-1)

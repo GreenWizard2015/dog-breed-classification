@@ -29,7 +29,6 @@ def augmentationsFor(target_size=224, N=2):
 
   mainAugmentations = A.Compose([ # light augmentations for main image
     A.RandomResizedCrop(target_size[0], target_size[1], scale=(0.5, 2.0), always_apply=True),
-    A.Flip(),
     A.Rotate(limit=45),
   ])
 
@@ -37,7 +36,7 @@ def augmentationsFor(target_size=224, N=2):
     A.MultiplicativeNoise(multiplier=(0.8, 1.2)),
     A.RandomBrightnessContrast(brightness_limit=0.025, contrast_limit=0.025),
     A.Downscale(scale_min=0.9, scale_max=0.9),
-    A.Sharpen(), A.ChannelShuffle(), A.ColorJitter(),
+    A.Sharpen(),
     A.Rotate(limit=25),
   ])
   return withAugmentations(
