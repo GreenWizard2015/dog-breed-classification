@@ -1,0 +1,6 @@
+tensorflow
+tensorflow-addons
+tensorflow-probability
+numpy
+opencv-python
+wandb
