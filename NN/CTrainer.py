@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utils import FakeObject
+from Utils.utils import FakeObject
 
 class CTrainer(tf.keras.Model):
   def __init__(self, model, NViews, **kwargs):
@@ -121,3 +121,11 @@ class CTrainer(tf.keras.Model):
       self._loss,
       self._accuracy, self._topK
     ]}
+  
+  # override save_weights to save the model only
+  def save_weights(self, *args, **kwargs):
+    return self._model.save_weights(*args, **kwargs)
+  
+  # override load_weights to load the model only
+  def load_weights(self, *args, **kwargs):
+    return self._model.load_weights(*args, **kwargs)

@@ -5,6 +5,18 @@ from NN.CTrainer import CTrainer
 import tensorflow as tf
 import argparse, json, os
 
+def _toRunName(args):
+  nameParts = []
+  if args.model_class_size: 
+    nameParts.append(f'HS-{args.model_class_size} ({args.model_hs_type})')
+  else:
+    nameParts.append('softmax')
+
+  nameParts.append(f'{args.views} views')
+  nameParts.append(f'{args.model_input}x{args.model_input}')
+  nameParts.append('grayscale' if args.model_grayscale else 'RGB')
+  return ', '.join(nameParts)
+
 def main(args):
   NViews = args.views
   dataset = CDataset( target_size=(args.model_input, args.model_input) )
@@ -15,6 +27,7 @@ def main(args):
     'imageSize': args.model_input,
     'classVecSize': args.model_class_size if args.model_class_size else None,
     'grayscale': bool(args.model_grayscale),
+    'HS type': args.model_hs_type,
   }
   print(json.dumps(modelConfig, indent=2)) # for debug
 
@@ -37,6 +50,8 @@ def main(args):
   USE_WANDB = args.wandb_user and args.wandb_project
   if USE_WANDB:
     import wandb
+
+    if args.wandb_run is None: args.wandb_run = _toRunName(args)
     wandb.init(
       entity=args.wandb_user,
       project=args.wandb_project,
@@ -82,6 +97,11 @@ if __name__ == "__main__":
 
   parser.add_argument('--model-input', type=int, default=224, help='Model input size')
   parser.add_argument('--model-class-size', type=int, default=32, help='Model class vector size. Will be used softmax if 0.')
+  # hyperspherical softmax type
+  parser.add_argument(
+    '--model-hs-type', type=str, default='base',
+    help='Hyperspherical softmax type ("base", "learnable", "learnable invertible")'
+  )
   # grayscale flag
   parser.add_argument('--model-grayscale', action='store_true', help='Use grayscale images during inference')
 
