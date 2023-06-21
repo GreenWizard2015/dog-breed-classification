@@ -25,7 +25,7 @@ def main(args):
     'classes': dataset.classes_names,
     'classesN': len(dataset.classes_names),
     'imageSize': args.model_input,
-    'classVecSize': args.model_class_size if args.model_class_size else None,
+    'classVecSize': args.model_class_size,
     'grayscale': bool(args.model_grayscale),
     'HS type': args.model_hs_type,
   }
