@@ -1,3 +1,5 @@
+Live demo: [https://huggingface.co/spaces/GreenWizard2015/dog-breed-classification-app](https://huggingface.co/spaces/GreenWizard2015/dog-breed-classification-app)
+
 # Dog breed classification using hyperspherical softmax
 
 A while ago, I worked on a project for a friend who wanted to develop a dog breed identification bot based on images. Instead of using an existing solution, I decided to take on the challenge and experiment with my own approach.
