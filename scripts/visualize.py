@@ -2,7 +2,6 @@ import argparse, os, sys
 # add parent folder to path
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
-from NN.model import model_from_config
 from Utils.WandBUtils import CWBRun
 import tensorflow as tf
 import numpy as np
@@ -15,9 +14,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
   run = CWBRun(args.wandb_run)
   modelConfig = run.config
-  model = model_from_config(modelConfig)
+  model = run.instantiateModel()
   model.summary()
-  model.load_weights(run.bestModel.pathTo())
   # find layer with class CHyperSoftmaxLayer
   hsl = [
     layer 

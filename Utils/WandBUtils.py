@@ -2,6 +2,7 @@ import wandb
 import tempfile
 import yaml
 from functools import lru_cache
+from NN.model import model_from_config
 
 def _fixWandbConfig(config):
   # if config is a dict with 'desc' and 'value' keys, return value
@@ -67,6 +68,11 @@ class CWBRun:
 
   @property
   def fullId(self): return self._runId
+
+  def instantiateModel(self):
+    model = model_from_config(self.config)
+    model.load_weights(self.bestModel.pathTo())
+    return model
 # End of CWBRun
 
 class CWBFileArtifact:

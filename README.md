@@ -31,3 +31,9 @@ Augmentations can include operations such as random rotations, translations, sca
 During training, the model predicts the breed of each augmented image, and additional loss is computed between the predictions of different versions of the original image. This additional loss encourages the neural network to learn features that are invariant to the applied augmentations. In other words, the model learns to recognize important characteristics of a dog breed regardless of changes in rotation, scale, or other transformations.
 
 This is particularly important when using hyperspherical softmax as it allows for refining the boundaries between classes. By applying data augmentations and incorporating additional loss, the model becomes more robust to variations and can better distinguish between different dog breeds.
+
+## Ablation study
+
+![](docs/img/mappings.png)
+
+The results of the ablation study indicate that a greater number of views enables the neural network to learn more gradual class boundaries. Additionally, increasing the dimensionality of the hypersphere allows the neural network to learn smoother class boundaries by creating more space between the classes. When the dimensionality is limited to 2, the neural network has a very restricted amount of space available, resulting in sharp boundaries. Based on my findings, it is clear that these factors significantly impact the smoothness of class separation.
