@@ -1,5 +1,5 @@
 from NN.CDataset import CDataset
-from NN.model import model_from_config
+from NN.model import model_from_config, BACKBONES
 from NN.CTrainer import CTrainer
 
 import tensorflow as tf
@@ -15,6 +15,7 @@ def _toRunName(args):
   nameParts.append(f'{args.views} views')
   nameParts.append(f'{args.model_input}x{args.model_input}')
   nameParts.append('grayscale' if args.model_grayscale else 'RGB')
+  nameParts.append(args.model_backbone)
   return ', '.join(nameParts)
 
 def main(args):
@@ -28,6 +29,7 @@ def main(args):
     'classVecSize': args.model_class_size,
     'grayscale': bool(args.model_grayscale),
     'HS type': args.model_hs_type,
+    'backbone': args.model_backbone,
   }
   print(json.dumps(modelConfig, indent=2)) # for debug
 
@@ -105,4 +107,12 @@ if __name__ == "__main__":
   # grayscale flag
   parser.add_argument('--model-grayscale', action='store_true', help='Use grayscale images during inference')
 
-  main(parser.parse_args())
+  # model backbone
+  parser.add_argument(
+    '--model-backbone', type=str, default='mobilenetv2',
+    help='Model backbone (%s)' % (', '.join(BACKBONES.keys()))
+  )
+
+  args = parser.parse_args()
+  assert args.model_hs_type in ['base', 'learnable', 'learnable invertible'], 'Unknown HS type'
+  main(args)
